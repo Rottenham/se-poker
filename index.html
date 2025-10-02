@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>IZE扑克生成器🃏</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
+  </head>
+  <!-- Google tag (gtag.js) -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-K7JZ6NCXTS"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-K7JZ6NCXTS");
+  </script>
+  <body>
+    <h1>IZE扑克生成器🃏</h1>
+    <div id="made_by">
+      <p>
+        by
+        <a href="https://space.bilibili.com/8252252" target="_blank"
+          >Crescendo</a
+        >, 2023/2/1（<a
+          href="https://github.com/Rottenham/ize-poker"
+          target="_blank"
+          >查看源码</a
+        >）
+      </p>
+    </div>
+    <div id="main">
+      <div id="column_1">
+        <form id="form" action="">
+          <p>珍珑名 <input type="text" id="name" value="珍珑名" /></p>
+          <p>
+            珍珑作者（ID、年份）
+            <input
+              type="button"
+              value="增加"
+              id="add_btn"
+              onclick="add_one()"
+            />
+            <input
+              type="button"
+              value="减少"
+              id="delete_btn"
+              onclick="delete_one()"
+            />
+            <input
+              type="button"
+              value="清空"
+              id="clear_btn"
+              onclick="delete_until_one()"
+            />
+          </p>
+          <div id="authors">
+            <li id="author_item_1">
+              <input type="text" name="author" value="甲" /><input
+                type="number"
+                name="year"
+                value="2020"
+              />
+            </li>
+            <li id="author_item_2">
+              <input type="text" name="author" value="乙" /><input
+                type="number"
+                name="year"
+                value="2020"
+              />
+            </li>
+            <li id="author_item_3">
+              <input type="text" name="author" value="丙" /><input
+                type="number"
+                name="year"
+                value="2022"
+              />
+            </li>
+            <div id="anchor"></div>
+          </div>
+          <p>上传阵图（800*600）</p>
+          <p id="upload">
+            <input type="file" accept="image/*" id="file" />
+          </p>
+          <p>
+            扑克点数
+            <select id="poker_num" onchange="handleNum()">
+              <option selected>A</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+              <option>10</option>
+              <option>J</option>
+              <option>Q</option>
+              <option>K</option>
+              <option>小王</option>
+              <option>大王</option>
+            </select>
+            扑克花色
+            <select id="poker_suit">
+              <option value="SPADE" selected>♠️ 黑桃</option>
+              <option value="HEART">♥️ 红桃</option>
+              <option value="DIAMOND">♦️ 方片</option>
+              <option value="CLUB">♣️ 草花</option>
+            </select>
+          </p>
+          <p>
+            角标
+            <select id="poker_mark">
+              <option selected>无</option>
+              <option>开局</option>
+              <option>残局</option>
+              <option>满局</option>
+              <option>特殊</option>
+              <option>坑杀</option>
+            </select>
+          </p>
+          <p id="submit">
+            <input
+              type="button"
+              id="submit-btn"
+              value="生成扑克"
+              onclick="submitForm(false)"
+            />
+          </p>
+        </form>
+      </div>
+      <div id="column_2">
+        <canvas
+          id="myCanvas"
+          width="200"
+          height="100"
+          style="border: 1px solid #d3d3d3"
+        >
+          Your browser does not support the HTML5 canvas tag.</canvas
+        >
+        <script type="text/javascript" src="script.js"></script>
+        <p class="instruction">右键保存图片</p>
+        <p class="instruction">
+          打印尺寸：300dpi，设计尺寸61*92mm，实际尺寸57*88mm（桥牌大小）
+          <br />出血位2mm，出血线内部3mm无文字
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

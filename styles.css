@@ -1,0 +1,73 @@
+﻿#myCanvas {
+  margin: 14px auto 0px auto;
+  display: block;
+}
+
+h1 {
+  text-align: center;
+  margin: 30px auto 0px auto;
+}
+
+#made_by {
+  text-align: center;
+  font-size: 14px;
+  color: gray;
+}
+
+#form {
+  text-align: center;
+  margin: 14px auto 0px auto;
+}
+
+#main {
+  display: flex;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+/* input {
+  font-size: 0.9em;
+}
+
+select {
+  font-size: 0.9em;
+}
+
+option {
+  font-size: 0.9em;
+}
+
+input[type="button"],
+input[type="file"] {
+  font-size: 1em;
+}
+
+#submit-btn {
+  font-size: 1.5em;
+} */
+
+#column_1 {
+  flex: 45%;
+}
+
+#column_2 {
+  flex: 55%;
+}
+
+#upload {
+  text-align-last: center;
+}
+
+#submit {
+  margin-top: 30px;
+}
+
+.instruction {
+  font-size: 80%;
+  text-align: center;
+  color: gray;
+}
+
+body {
+  font-family: sans-serif;
+}
