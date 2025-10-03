@@ -133,7 +133,7 @@ function getName() {
 // 获得场地
 function getScene() {
   let e = document.getElementById("scene");
-  return e.options[e.selectedIndex].text;
+  return e.options[e.selectedIndex].text.toLowerCase();
 }
 
 // 获得点数
