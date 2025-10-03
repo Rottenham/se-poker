@@ -33,23 +33,31 @@ function submitForm(mockup) {
   let num = getPokerNum();
   let suit = getPokerSuit();
   let mark_type = getPokerMark();
+  let stamp_type = getPokerStamp();
+  let scene = getScene();
   if (mockup) {
-    generatePoker(puzzle_img, author, name, num, suit, mark_type, true);
+    generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, true, false);
   } else {
     var puzzle_img = getImage();
     if (!puzzle_img) {
       return;
     }
     puzzle_img.onload = function (e) {
-      if (this.width !== 800) {
-        alert("阵图宽度应为800px");
-        return;
-      }
+      let isPokerStyle = false;
       if (this.height !== 600) {
         alert("阵图高度应为600px");
         return;
       }
-      generatePoker(puzzle_img, author, name, num, suit, mark_type, false);
+      if (this.width === 917) {
+        isPokerStyle = true;
+      }
+      else if (this.width === 800) {
+        isPokerStyle = false;
+      } else {
+        alert("阵图宽度应为800px（游戏等宽）或917px（扑克等宽）");
+        return;
+      }
+      generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, false, isPokerStyle);
     };
   }
 }
@@ -92,7 +100,7 @@ function getAuthors() {
       }
     }
     min_year = String(min_year);
-    for (let i = 0; i < years.length; ) {
+    for (let i = 0; i < years.length;) {
       if (years[i] === min_year) {
         if (auth_list.length > 0) {
           auth_list += "，";
@@ -112,14 +120,20 @@ function getAuthors() {
   return ans;
 }
 
-// 获得珍珑名
+// 获得阵型名
 function getName() {
   let name = document.getElementById("name").value;
   if (!name) {
-    alert("珍珑名为空");
+    alert("阵型名为空");
     return null;
   }
   return name;
+}
+
+// 获得场地
+function getScene() {
+  let e = document.getElementById("scene");
+  return e.options[e.selectedIndex].text;
 }
 
 // 获得点数
@@ -140,6 +154,12 @@ function getPokerMark() {
   return e.options[e.selectedIndex].text;
 }
 
+// 获得印章
+function getPokerStamp() {
+  let e = document.getElementById("poker_stamp");
+  return e.options[e.selectedIndex].text;
+}
+
 // 获得阵图
 function getImage() {
   let file = document.getElementById("file");
@@ -152,22 +172,37 @@ function getImage() {
   return img;
 }
 
+// 获得绘制坐标
+function getDrawImageCoords(isPokerStyle) {
+  if (!isPokerStyle) {
+    return [222, 108, 675, 506];
+  } else {
+    return [171, 108, 774, 506];
+  }
+}
+
+// 获得特殊数字
+function getSpecialNum(num, suit = null) {
+  return `images/特殊数字/${num}${suit ?? ""}.png`;
+}
+
 // 绘制
-function generatePoker(puzzle_img, author, name, num, suit, mark_type, mockup) {
+function generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, mockup, isPokerStyle) {
+  const [dx, dy, dw, dh] = getDrawImageCoords(isPokerStyle);
   ctx.clearRect(0, 0, cvs.width, cvs.height);
   drawWhiteBackground(ctx);
   drawAuthor(ctx, author);
   drawName(ctx, name);
-  night_img = new Image();
-  night_img.src = "images/night.png";
-  night_img.onload = function (e) {
-    ctx.drawImage(night_img, 109, 108, 871, 506);
+  scene_img = new Image();
+  scene_img.src = `images/场地/${scene}.png`;
+  scene_img.onload = function (e) {
+    ctx.drawImage(scene_img, 109, 108, 871, 506);
     if (mockup) {
       ctx.fillStyle = "#5253b0";
-      ctx.fillRect(222, 108, 675, 506);
+      ctx.fillRect(dx, dy, dw, dh);
       ctx.fillStyle = "black";
     } else {
-      ctx.drawImage(puzzle_img, 222, 108, 675, 506);
+      ctx.drawImage(puzzle_img, dx, dy, dw, dh);
     }
     frame_img = new Image();
     frame_img.src = "images/frame.png";
@@ -179,17 +214,19 @@ function generatePoker(puzzle_img, author, name, num, suit, mark_type, mockup) {
         ctx.drawImage(poem_img, 0, 0);
         if (num === "小王") {
           number_img = new Image();
-          number_img.src = "images/little_joker.png";
+          number_img.src = getSpecialNum(num);
           number_img.onload = function (e) {
             ctx.drawImage(number_img, 0, 0);
             drawMark(ctx, mark_type);
+            drawStamp(ctx, stamp_type);
           };
         } else if (num === "大王") {
           number_img = new Image();
-          number_img.src = "images/big_joker.png";
+          number_img.src = getSpecialNum(num);
           number_img.onload = function (e) {
             ctx.drawImage(number_img, 0, 0);
             drawMark(ctx, mark_type);
+            drawStamp(ctx, stamp_type);
           };
         } else {
           suit_img = new Image();
@@ -198,16 +235,16 @@ function generatePoker(puzzle_img, author, name, num, suit, mark_type, mockup) {
             drawSuit(ctx, suit_img);
             if (num === "10") {
               number_img = new Image();
-              number_img.src = isRed(suit)
-                ? "images/10_red.png"
-                : "images/10.png";
+              number_img.src = getSpecialNum(num, isRed(suit) ? "_red" : "_black");
               number_img.onload = function (e) {
                 ctx.drawImage(number_img, 0, 0);
                 drawMark(ctx, mark_type);
+                drawStamp(ctx, stamp_type);
               };
             } else {
               drawNumber(ctx, num, suit);
               drawMark(ctx, mark_type);
+              drawStamp(ctx, stamp_type);
             }
           };
         }
@@ -223,14 +260,14 @@ function drawWhiteBackground(ctx) {
   ctx.fillStyle = "black";
 }
 
-// 绘制珍珑作者
+// 绘制阵型作者
 function drawAuthor(ctx, author) {
   ctx.textAlign = "left";
   ctx.font = "25px 楷体";
   ctx.fillText(author, 103, 72);
 }
 
-// 绘制珍珑名
+// 绘制阵型名
 function drawName(ctx, name) {
   ctx.textAlign = "right";
   ctx.font = "29.17px 楷体";
@@ -245,7 +282,7 @@ function isRed(suit) {
 
 // 返回花色对应的图标文件名
 function getSuitImage(suit) {
-  return "images/suit_" + suit.toLowerCase() + ".png";
+  return "images/花色/" + suit.toLowerCase() + ".png";
 }
 
 // 绘制花色
@@ -264,20 +301,27 @@ function drawSuit(ctx, suit_img) {
 
 // 绘制角标
 function drawMark(ctx, mark_type) {
-  mark_img = new Image();
-  if (mark_type === "开局") {
-    mark_img.src = "images/kai_mark.png";
-  } else if (mark_type === "残局") {
-    mark_img.src = "images/can_mark.png";
-  } else if (mark_type === "满局") {
-    mark_img.src = "images/man_mark.png";
-  } else if (mark_type === "坑杀") {
-    mark_img.src = "images/keng_mark.png";
-  } else if (mark_type === "特殊") {
-    mark_img.src = "images/te_mark.png";
+  if (mark_type === "无") {
+    console.log("无需绘制角标");
+    return;
   }
+  mark_img = new Image();
+  mark_img.src = `images/角标/${mark_type}.png`;
   mark_img.onload = function (e) {
     ctx.drawImage(mark_img, 1027 - mark_img.width, 660 - mark_img.height);
+  };
+}
+
+// 绘制印章
+function drawStamp(ctx, stamp_type) {
+  if (stamp_type === "无") {
+    console.log("无需绘制印章");
+    return;
+  }
+  stamp_img = new Image();
+  stamp_img.src = `images/印章/${stamp_type}.png`;
+  stamp_img.onload = function (e) {
+    ctx.drawImage(stamp_img, 1027 - stamp_img.width - 80, 660 - stamp_img.height - 80);
   };
 }
 
@@ -350,7 +394,7 @@ function delete_one() {
   document.getElementById("author_item_" + size).remove();
 }
 
-// 清空作者输入栏与珍珑名
+// 清空作者输入栏与阵型名
 function delete_until_one() {
   let size = document.getElementsByName("author").length;
   for (let i = 2; i <= size; i++) {
