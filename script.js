@@ -20,8 +20,7 @@ var ctx = cvs.getContext("2d");
 ctx.textBaseline = "top";
 
 // 提交表单
-// mockup -- 是否使用预设阵图，作为预览
-function submitForm(mockup) {
+function submitForm(useMockImage) {
   let author = getAuthors();
   if (!author) {
     return;
@@ -35,7 +34,7 @@ function submitForm(mockup) {
   let mark_type = getPokerMark();
   let stamp_type = getPokerStamp();
   let scene = getScene();
-  if (mockup) {
+  if (useMockImage) {
     generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, true, false);
   } else {
     var puzzle_img = getImage();
@@ -184,7 +183,7 @@ function getDrawImageCoords(isPokerStyle) {
 }
 
 // 绘制
-function generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, mockup, isPokerStyle) {
+function generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, useMockImage, isPokerStyle) {
   const [dx, dy, dw, dh] = getDrawImageCoords(isPokerStyle);
   ctx.clearRect(0, 0, cvs.width, cvs.height);
   drawWhiteBackground(ctx);
@@ -194,7 +193,7 @@ function generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_typ
   scene_img.src = `images/场地/${scene}.png`;
   scene_img.onload = function (e) {
     ctx.drawImage(scene_img, 109, 108, 871, 506);
-    if (mockup) {
+    if (useMockImage) {
       ctx.fillStyle = "#5253b0";
       ctx.fillRect(dx, dy, dw, dh);
       ctx.fillStyle = "black";
@@ -323,7 +322,6 @@ function drawNumber(ctx, num, suit) {
     ctx.fillText(num, 0, 0);
     ctx.restore();
   }
-
 }
 
 // 设置分辨率
@@ -338,6 +336,20 @@ function setDPI(canvas, dpi, width, height) {
   canvas.height = Math.ceil(canvas.height * scaleFactor);
   var ctx = canvas.getContext("2d");
   ctx.scale(scaleFactor, scaleFactor);
+}
+
+// 如果阵名里包含场景，自动设定场景
+function handleName() {
+  const name = document.getElementById("name").value;
+  const scenes = Object.fromEntries([...document.querySelectorAll("#scene option")].map(o => [o.value, o.text]));
+  scenes["D6E"] = "PE";
+  scenes["N6E"] = "FE";
+  for (const [sceneInName, sceneOption] of Object.entries(scenes)) {
+    if (name.toUpperCase().includes(sceneInName)) {
+      document.getElementById("scene").value = sceneOption;
+      return;
+    }
+  }
 }
 
 // 如果点数为大/小王，禁用花色
