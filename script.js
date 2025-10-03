@@ -139,13 +139,15 @@ function getScene() {
 // 获得点数
 function getPokerNum() {
   let e = document.getElementById("poker_num");
-  return e.options[e.selectedIndex].text;
+  const text = e.options[e.selectedIndex].text;
+  return text === "无" ? null : text;
 }
 
 // 获得花色
 function getPokerSuit() {
   let e = document.getElementById("poker_suit");
-  return e.value;
+  const value = e.value;
+  return value === "无" ? null : value;
 }
 
 // 获得角标
@@ -181,11 +183,6 @@ function getDrawImageCoords(isPokerStyle) {
   }
 }
 
-// 获得特殊数字
-function getSpecialNum(num, suit = null) {
-  return `images/特殊数字/${num}${suit ?? ""}.png`;
-}
-
 // 绘制
 function generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, mockup, isPokerStyle) {
   const [dx, dy, dw, dh] = getDrawImageCoords(isPokerStyle);
@@ -212,42 +209,10 @@ function generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_typ
       poem_img.src = "images/poem.png";
       poem_img.onload = function (e) {
         ctx.drawImage(poem_img, 0, 0);
-        if (num === "小王") {
-          number_img = new Image();
-          number_img.src = getSpecialNum(num);
-          number_img.onload = function (e) {
-            ctx.drawImage(number_img, 0, 0);
-            drawMark(ctx, mark_type);
-            drawStamp(ctx, stamp_type);
-          };
-        } else if (num === "大王") {
-          number_img = new Image();
-          number_img.src = getSpecialNum(num);
-          number_img.onload = function (e) {
-            ctx.drawImage(number_img, 0, 0);
-            drawMark(ctx, mark_type);
-            drawStamp(ctx, stamp_type);
-          };
-        } else {
-          suit_img = new Image();
-          suit_img.src = getSuitImage(suit);
-          suit_img.onload = function (e) {
-            drawSuit(ctx, suit_img);
-            if (num === "10") {
-              number_img = new Image();
-              number_img.src = getSpecialNum(num, isRed(suit) ? "_red" : "_black");
-              number_img.onload = function (e) {
-                ctx.drawImage(number_img, 0, 0);
-                drawMark(ctx, mark_type);
-                drawStamp(ctx, stamp_type);
-              };
-            } else {
-              drawNumber(ctx, num, suit);
-              drawMark(ctx, mark_type);
-              drawStamp(ctx, stamp_type);
-            }
-          };
-        }
+        drawSuit(ctx, suit, num);
+        drawNumber(ctx, num, suit);
+        drawMark(ctx, mark_type);
+        drawStamp(ctx, stamp_type);
       };
     };
   };
@@ -275,28 +240,26 @@ function drawName(ctx, name) {
   ctx.textAlign = "left";
 }
 
-// 返回某花色是否为红色（红桃、方片）
-function isRed(suit) {
-  return suit === "HEART" || suit === "DIAMOND";
-}
-
-// 返回花色对应的图标文件名
-function getSuitImage(suit) {
-  return "images/花色/" + suit.toLowerCase() + ".png";
-}
-
 // 绘制花色
-function drawSuit(ctx, suit_img) {
-  ctx.save();
-  ctx.translate(936, 60);
-  ctx.rotate(Math.PI / 2);
-  ctx.drawImage(suit_img, 0, 0);
-  ctx.restore();
-  ctx.save();
-  ctx.translate(151, 660);
-  ctx.rotate(-Math.PI / 2);
-  ctx.drawImage(suit_img, 0, 0);
-  ctx.restore();
+function drawSuit(ctx, suit, num) {
+  if (!suit || ["小王", "大王"].includes(num)) {
+    console.log("无需绘制花色");
+    return;
+  }
+  suit_img = new Image();
+  suit_img.src = "images/花色/" + suit.toLowerCase() + ".png";
+  suit_img.onload = function (e) {
+    ctx.save();
+    ctx.translate(936, 60);
+    ctx.rotate(Math.PI / 2);
+    ctx.drawImage(suit_img, 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(151, 660);
+    ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(suit_img, 0, 0);
+    ctx.restore();
+  }
 }
 
 // 绘制角标
@@ -327,22 +290,40 @@ function drawStamp(ctx, stamp_type) {
 
 // 绘制数字
 function drawNumber(ctx, num, suit) {
-  ctx.save();
-  ctx.fillStyle = isRed(suit) ? "#fc0303" : "#000000";
-  ctx.translate(1027, 60);
-  ctx.rotate(Math.PI / 2);
-  ctx.textAlign = "left";
-  ctx.font = "75px Poker";
-  ctx.fillText(num, 0, 0);
-  ctx.restore();
-  ctx.save();
-  ctx.fillStyle = isRed(suit) ? "#fc0303" : "#000000";
-  ctx.translate(60, 660);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "left";
-  ctx.font = "75px Poker";
-  ctx.fillText(num, 0, 0);
-  ctx.restore();
+  if (!num) {
+    console.log("无需绘制数字");
+    return;
+  }
+  const is_red = suit === "HEART" || suit === "DIAMOND";
+  if (["10", "小王", "大王"].includes(num)) {
+    let filename = num;
+    if (num === "10") {
+      filename += is_red ? "_red" : "_black";
+    }
+    number_img = new Image();
+    number_img.src = `/images/特殊数字/${filename}.png`;
+    number_img.onload = function (e) {
+      ctx.drawImage(number_img, 0, 0);
+    }
+  } else {
+    ctx.save();
+    ctx.fillStyle = is_red ? "#fc0303" : "#000000";
+    ctx.translate(1027, 60);
+    ctx.rotate(Math.PI / 2);
+    ctx.textAlign = "left";
+    ctx.font = "75px Poker";
+    ctx.fillText(num, 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle = is_red ? "#fc0303" : "#000000";
+    ctx.translate(60, 660);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "left";
+    ctx.font = "75px Poker";
+    ctx.fillText(num, 0, 0);
+    ctx.restore();
+  }
+
 }
 
 // 设置分辨率
