@@ -20,7 +20,7 @@ var ctx = cvs.getContext("2d");
 ctx.textBaseline = "top";
 
 // 提交表单
-function submitForm(useMockImage) {
+function submitForm(suppressNoImageWarning) {
   let author = getAuthors();
   if (!author) {
     return;
@@ -34,13 +34,10 @@ function submitForm(useMockImage) {
   let mark_type = getPokerMark();
   let stamp_type = getPokerStamp();
   let scene = getScene();
-  if (useMockImage) {
+  var puzzle_img = getImage(suppressNoImageWarning);
+  if (!puzzle_img) {
     generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, true, false);
   } else {
-    var puzzle_img = getImage();
-    if (!puzzle_img) {
-      return;
-    }
     puzzle_img.onload = function (e) {
       let isPokerStyle = false;
       if (this.height !== 600) {
@@ -162,10 +159,10 @@ function getPokerStamp() {
 }
 
 // 获得阵图
-function getImage() {
+function getImage(suppressNoImageWarning) {
   let file = document.getElementById("file");
   if (file.files.length === 0) {
-    alert("未上传阵图");
+    if (!suppressNoImageWarning) alert("未上传阵图，将使用默认图片");
     return null;
   }
   let img = new Image();
