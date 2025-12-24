@@ -71,3 +71,18 @@ input[type="file"] {
 body {
   font-family: sans-serif;
 }
+
+#author_name_font_size {
+  width: 12ch;
+  box-sizing: border-box;
+}
+
+#author_name_font_size::-webkit-outer-spin-button,
+#author_name_font_size::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#author_name_font_size {
+  -moz-appearance: textfield;
+}

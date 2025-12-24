@@ -110,6 +110,8 @@
             <option>无</option>
             <option selected>渣心雕虫</option>
           </select>
+          署名字号
+          <input type="number" min="1" onkeydown="return event.key !== '-'" id="author_name_font_size" value="25">
         </p>
         <p id="submit">
           <input type="button" id="submit-btn" value="生成扑克" onclick="submitForm(false)" />

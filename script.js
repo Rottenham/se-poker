@@ -34,9 +34,13 @@ function submitForm(suppressNoImageWarning) {
   let mark_type = getPokerMark();
   let stamp_type = getPokerStamp();
   let scene = getScene();
+  let authorNameFontSize = getAuthorNameFontSize();
+  if (!authorNameFontSize) {
+    return;
+  }
   var puzzle_img = getImage(suppressNoImageWarning);
   if (!puzzle_img) {
-    generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, true, false);
+    generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, authorNameFontSize, true, false);
   } else {
     puzzle_img.onload = function (e) {
       let isPokerStyle = false;
@@ -53,7 +57,7 @@ function submitForm(suppressNoImageWarning) {
         alert("阵图宽度应为800px（游戏等宽）或917px（扑克等宽）");
         return;
       }
-      generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, false, isPokerStyle);
+      generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, authorNameFontSize, false, isPokerStyle);
     };
   }
 }
@@ -179,12 +183,22 @@ function getDrawImageCoords(isPokerStyle) {
   }
 }
 
+// 获得署名字号
+function getAuthorNameFontSize() {
+  const fontSize = Number(document.getElementById("author_name_font_size").value);
+  if (!(Number.isFinite(fontSize) && fontSize > 0)) {
+    alert('署名字号应为正数');
+    return null;
+  }
+  return fontSize;
+}
+
 // 绘制
-function generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, useMockImage, isPokerStyle) {
+function generatePoker(puzzle_img, author, name, num, suit, mark_type, stamp_type, scene, authorNameFontSize, useMockImage, isPokerStyle) {
   const [dx, dy, dw, dh] = getDrawImageCoords(isPokerStyle);
   ctx.clearRect(0, 0, cvs.width, cvs.height);
   drawWhiteBackground(ctx);
-  drawAuthor(ctx, author);
+  drawAuthor(ctx, author, authorNameFontSize);
   drawName(ctx, name);
   scene_img = new Image();
   scene_img.src = `images/场地/${scene}.png`;
@@ -222,10 +236,10 @@ function drawWhiteBackground(ctx) {
 }
 
 // 绘制阵型作者
-function drawAuthor(ctx, author) {
+function drawAuthor(ctx, author, fontSize) {
   ctx.textAlign = "left";
-  ctx.font = "25px 楷体";
-  ctx.fillText(author, 103, 72);
+  ctx.font = `${fontSize}px 楷体`;
+  ctx.fillText(author, 103, 72 + (25 - fontSize));
 }
 
 // 绘制阵型名
