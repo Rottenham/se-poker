@@ -297,7 +297,7 @@ function drawNumber(ctx, num, suit) {
       filename += is_red ? "_red" : "_black";
     }
     number_img = new Image();
-    number_img.src = `/images/特殊数字/${filename}.png`;
+    number_img.src = `images/特殊数字/${filename}.png`;
     number_img.onload = function (e) {
       ctx.drawImage(number_img, 0, 0);
     }
